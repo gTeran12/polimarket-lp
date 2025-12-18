@@ -1,0 +1,39 @@
+/* src/pages/front/Products.css */
+.product-img {
+  height: 400px;
+  width: 100%;
+}
+
+.card-body button {
+  margin-top: auto;
+}
+
+.product-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.dropdown-menu {
+    z-index: 99999 !important;
+}
+
+/* Keep footer pinned to the bottom without covering content */
+html, body {
+  height: 100%;
+}
+
+body {
+  padding-bottom: 100px; /* space so fixed footer doesn't overlap content */
+}
+
+#root {
+  min-height: 100%;
+}
+
+.site-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+}
