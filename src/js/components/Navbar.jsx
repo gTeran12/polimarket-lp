@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
 
 const Navbar = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const { cart } = useContext(CartContext);
     const { user, logout } = useContext(AuthContext); // get user and logout function
     const navigate = useNavigate();
@@ -15,25 +15,39 @@ const Navbar = () => {
         try {
             logout(); // update auth context
             navigate("/"); // redirect to home
+            setIsOpen(false);
         } catch (err) {
             console.error(err);
         }
     };
 
+    const handleNavLinkClick = () => setIsOpen(false);
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
             <div className="container">
                 <Link className="navbar-brand fw-bold" to="/">PoliMarket</Link>
-                <div className="collapse navbar-collapse" id="navbarNav">
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    aria-controls="navbarNav"
+                    aria-expanded={isOpen}
+                    aria-label="Toggle navigation"
+                    onClick={() => setIsOpen(!isOpen)}
+                >
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+
+                <div className={`collapse navbar-collapse ${isOpen ? "show" : ""}`} id="navbarNav">
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
-                            <Link className="nav-link" to="/">Home</Link>
+                            <Link className="nav-link" to="/" onClick={handleNavLinkClick}>Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/products">Products</Link>
+                            <Link className="nav-link" to="/products" onClick={handleNavLinkClick}>Products</Link>
                         </li>
                         <li className="nav-item position-relative">
-                            <Link className="nav-link" to="/cart">
+                            <Link className="nav-link" to="/cart" onClick={handleNavLinkClick}>
                                 Cart
                                 {cartCount > 0 && (
                                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -47,10 +61,10 @@ const Navbar = () => {
                         {!user && (
                             <>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/login">Login</Link>
+                                    <Link className="nav-link" to="/login" onClick={handleNavLinkClick}>Login</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/register">Register</Link>
+                                    <Link className="nav-link" to="/register" onClick={handleNavLinkClick}>Register</Link>
                                 </li>
                             </>
                         )}
@@ -63,6 +77,7 @@ const Navbar = () => {
                                     id="userDropdown"
                                     data-bs-toggle="dropdown"
                                     aria-expanded="false"
+                                    onClick={() => setIsOpen(false)}
                                 >
                                     {user.name}
                                 </button>
