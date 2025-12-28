@@ -4,6 +4,7 @@ import Footer from "../../components/Footer";
 import { CartContext } from "../../context/CartContext";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import axiosClient from "../../context/axiosClient";
+import { useTranslation } from "react-i18next";
 import {
   Container,
   Row,
@@ -22,15 +23,16 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("latest");
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const { t, i18n } = useTranslation();
 
   const PRODUCTS_PER_PAGE = 24;
   const [displayedProductCount, setDisplayedProductCount] = useState(PRODUCTS_PER_PAGE);
   const hasMoreProducts = displayedProductCount < filteredProducts.length;
 
   useEffect(() => {
-    document.title = "Products | MyShop";
+    document.title = t("products.metaTitle");
     fetchProducts();
-  }, []);
+  }, [t, i18n.language]);
 
   useEffect(() => {
     let sortedProducts = [...products];
@@ -68,7 +70,7 @@ const Products = () => {
 
   const handleAddToCart = async (product) => {
     await addToCart(product.id);
-    alert(`${product.name} added to cart`);
+    alert(t("products.addedAlert", { name: product.name }));
   };
 
   if (loading) return <LoadingSpinner />;
@@ -77,12 +79,12 @@ const Products = () => {
     <div className="d-flex flex-column min-vh-100">
       <Navbar />
       <Container className="mt-5 flex-grow-1">
-        <h2 className="mb-4 text-center">Our Products</h2>
+        <h2 className="mb-4 text-center">{t("products.heading")}</h2>
         <Row className="mb-4">
           <Col md={6}>
             <FormControl
               type="text"
-              placeholder="Search products..."
+              placeholder={t("products.searchPlaceholder")}
               className="mr-sm-2"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -94,9 +96,9 @@ const Products = () => {
               value={sortOrder}
               style={{ width: "200px" }}
             >
-              <option value="latest">Latest</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
+              <option value="latest">{t("products.sortLatest")}</option>
+              <option value="price-asc">{t("products.sortPriceAsc")}</option>
+              <option value="price-desc">{t("products.sortPriceDesc")}</option>
             </Form.Select>
           </Col>
         </Row>
@@ -119,7 +121,7 @@ const Products = () => {
                     onClick={() => handleAddToCart(product)}
                   >
                     <i className="fas fa-shopping-cart me-2"></i>
-                    Add to Cart
+                    {t("products.addToCart")}
                   </Button>
                 </Card.Body>
               </Card>
@@ -130,7 +132,7 @@ const Products = () => {
           <Col className="text-center">
             {hasMoreProducts && (
               <Button onClick={handleLoadMore} variant="info">
-                Load More Products
+                {t("products.loadMore")}
               </Button>
             )}
           </Col>

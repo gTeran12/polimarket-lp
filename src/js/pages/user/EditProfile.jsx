@@ -3,6 +3,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const EditProfile = () => {
     const { user, setUser } = useContext(AuthContext);
@@ -13,8 +14,10 @@ const EditProfile = () => {
     });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
+        document.title = t("editProfile.metaTitle");
         if (user) {
             setFormData({
                 name: user.name,
@@ -22,7 +25,7 @@ const EditProfile = () => {
                 phone: user.phone || ''
             });
         }
-    }, [user]);
+    }, [user, t, i18n.language]);
 
     const handleChange = (e) => {
         setFormData({
@@ -39,7 +42,7 @@ const EditProfile = () => {
         try {
             const response = await axios.post('/profile', formData);
             setUser(response.data.user);
-            setSuccess('Profile updated successfully!');
+            setSuccess(t("editProfile.success"));
             setTimeout(() => setSuccess(''), 3000);
         } catch (error) {
             console.error('Failed to update profile:', error);
@@ -52,23 +55,23 @@ const EditProfile = () => {
         <div>
             <Navbar />
             <div className="container py-4">
-                <h1>Edit Profile</h1>
+                <h1>{t("editProfile.title")}</h1>
                 {success && <div className="alert alert-success">{success}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                        <label htmlFor="name" className="form-label">Name</label>
+                        <label htmlFor="name" className="form-label">{t("editProfile.name")}</label>
                         <input type="text" id="name" name="name" className="form-control" value={formData.name} onChange={handleChange} />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="email" className="form-label">Email</label>
+                        <label htmlFor="email" className="form-label">{t("editProfile.email")}</label>
                         <input type="email" id="email" name="email" className="form-control" value={formData.email} onChange={handleChange} />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="phone" className="form-label">Phone</label>
+                        <label htmlFor="phone" className="form-label">{t("editProfile.phone")}</label>
                         <input type="text" id="phone" name="phone" className="form-control" value={formData.phone} onChange={handleChange} />
                     </div>
                     <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? 'Updating...' : 'Update Profile'}
+                        {loading ? t("editProfile.submitting") : t("editProfile.submit")}
                     </button>
                 </form>
             </div>

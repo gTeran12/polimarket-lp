@@ -4,10 +4,12 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext"; // ✅ import AuthContext
+import { useTranslation } from "react-i18next";
 
 const Register = () => {
     const navigate = useNavigate();
     const { user } = useContext(AuthContext); // ✅ get user from context
+    const { t, i18n } = useTranslation();
 
     const [form, setForm] = useState({
         name: "",
@@ -21,10 +23,11 @@ const Register = () => {
 
     // ✅ Redirect if already logged in
     useEffect(() => {
+        document.title = t("register.metaTitle");
         if (user) {
             navigate("/"); // redirect to home if logged in
         }
-    }, [user, navigate]);
+    }, [user, navigate, t, i18n.language]);
 
     const handleInput = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -38,7 +41,7 @@ const Register = () => {
 
             const res = await axios.post("/register", form);
 
-            setMessage("Registration successful!");
+            setMessage(t("register.success"));
             setErrors({}); // Clear errors
 
             // Reset form fields
@@ -67,13 +70,13 @@ const Register = () => {
         <div>
             <Navbar />
             <div className="container mt-5" style={{ maxWidth: "500px" }}>
-                <h2 className="mb-4">Register</h2>
+                <h2 className="mb-4">{t("register.title")}</h2>
 
                 {message && <div className="alert alert-success">{message}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                        <label className="form-label">Name</label>
+                        <label className="form-label">{t("register.name")}</label>
                         <input
                             type="text"
                             name="name"
@@ -85,7 +88,7 @@ const Register = () => {
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">Email</label>
+                        <label className="form-label">{t("register.email")}</label>
                         <input
                             type="email"
                             name="email"
@@ -97,7 +100,7 @@ const Register = () => {
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">Password</label>
+                        <label className="form-label">{t("register.password")}</label>
                         <input
                             type="password"
                             name="password"
@@ -109,7 +112,7 @@ const Register = () => {
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">Confirm Password</label>
+                        <label className="form-label">{t("register.confirmPassword")}</label>
                         <input
                             type="password"
                             name="password_confirmation"
@@ -119,7 +122,7 @@ const Register = () => {
                         />
                     </div>
 
-                    <button className="btn btn-primary w-100">Register</button>
+                    <button className="btn btn-primary w-100">{t("register.submit")}</button>
                 </form>
             </div>
             <Footer />

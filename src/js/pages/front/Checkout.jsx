@@ -9,6 +9,7 @@ import StripePaymentForm from "../../components/StripePaymentForm";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import PayPalPaymentButtons from "../../components/PayPalPaymentButtons";
 import axiosClient from "../../context/axiosClient"; // <- Axios instance with guest ID
+import { useTranslation } from "react-i18next";
 
 // Stripe setup
 const stripePromise = loadStripe("pk_test_YOUR_STRIPE_PUBLIC_KEY");
@@ -27,12 +28,13 @@ const Checkout = () => {
   const [address, setAddress] = useState({ name: "", phone: "", street: "", city: "", zip: "" });
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   // Fetch cart on mount
   useEffect(() => {
-    document.title = "Checkout | MyShop";
+    document.title = t("checkout.metaTitle");
     fetchCart().finally(() => setLoading(false));
-  }, []);
+  }, [t, i18n.language]);
 
   // Handle order placement
   const handlePlaceOrder = async (e, stripePaymentMethodId = null, paypalOrderId = null) => {
@@ -59,39 +61,39 @@ const Checkout = () => {
       const res = await axiosClient.post("/api/frontend/orders", orderData);
 
       clearCart();
-      alert("Order placed successfully! Order ID: " + res.data.order_id);
+      alert(t("checkout.orderSuccess", { id: res.data.order_id }));
       navigate("/");
     } catch (err) {
       console.error(err);
       if (err.response?.data?.errors) {
         // Validation errors
         const errorMessages = Object.values(err.response.data.errors).flat().join("\n");
-        alert("Validation Error:\n" + errorMessages);
+        alert(`${t("checkout.validationError")}\n${errorMessages}`);
       } else {
-        alert(err.response?.data?.error || err.response?.data?.message || "Error placing order");
+        alert(err.response?.data?.error || err.response?.data?.message || t("checkout.errorGeneric"));
       }
     }
   };
 
-  if (loading) return <p>Loading checkout...</p>;
+  if (loading) return <p>{t("checkout.loading")}</p>;
 
   return (
     <div>
       <Navbar />
       <div className="container my-4">
-        <h2>Checkout</h2>
+        <h2>{t("checkout.title")}</h2>
 
         {cart.items.length === 0 ? (
-          <p>Your cart is empty.</p>
+          <p>{t("checkout.empty")}</p>
         ) : (
           <>
             <table className="table">
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Subtotal</th>
+                  <th>{t("checkout.product")}</th>
+                  <th>{t("checkout.qty")}</th>
+                  <th>{t("checkout.price")}</th>
+                  <th>{t("checkout.subtotal")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,13 +107,13 @@ const Checkout = () => {
                 ))}
               </tbody>
             </table>
-            <h4>Subtotal: ${cart.subtotal}</h4>
+            <h4>{t("checkout.subtotal")}: ${cart.subtotal}</h4>
 
             <form onSubmit={paymentMethod === "cod" ? handlePlaceOrder : (e) => e.preventDefault()}>
-              <h5>Shipping Address</h5>
+              <h5>{t("checkout.shippingAddress")}</h5>
               <input
                 type="text"
-                placeholder="Full Name"
+                placeholder={t("checkout.fullName")}
                 className="form-control mb-2"
                 value={address.name}
                 onChange={(e) => setAddress({ ...address, name: e.target.value })}
@@ -119,7 +121,7 @@ const Checkout = () => {
               />
               <input
                 type="text"
-                placeholder="Phone"
+                placeholder={t("checkout.phone")}
                 className="form-control mb-2"
                 value={address.phone}
                 onChange={(e) => setAddress({ ...address, phone: e.target.value })}
@@ -127,7 +129,7 @@ const Checkout = () => {
               />
               <input
                 type="text"
-                placeholder="Street"
+                placeholder={t("checkout.street")}
                 className="form-control mb-2"
                 value={address.street}
                 onChange={(e) => setAddress({ ...address, street: e.target.value })}
@@ -135,7 +137,7 @@ const Checkout = () => {
               />
               <input
                 type="text"
-                placeholder="City"
+                placeholder={t("checkout.city")}
                 className="form-control mb-2"
                 value={address.city}
                 onChange={(e) => setAddress({ ...address, city: e.target.value })}
@@ -143,14 +145,14 @@ const Checkout = () => {
               />
               <input
                 type="text"
-                placeholder="ZIP"
+                placeholder={t("checkout.zip")}
                 className="form-control mb-3"
                 value={address.zip}
                 onChange={(e) => setAddress({ ...address, zip: e.target.value })}
                 required
               />
 
-              <h5 className="mt-3">Payment Method</h5>
+              <h5 className="mt-3">{t("checkout.paymentMethod")}</h5>
               <div className="mb-3">
                 <div className="form-check">
                   <input
@@ -160,7 +162,7 @@ const Checkout = () => {
                     checked={paymentMethod === "cod"}
                     onChange={() => setPaymentMethod("cod")}
                   />
-                  <label className="form-check-label">Cash on Delivery (COD)</label>
+                  <label className="form-check-label">{t("checkout.cod")}</label>
                 </div>
                 <div className="form-check">
                   <input
@@ -170,7 +172,7 @@ const Checkout = () => {
                     checked={paymentMethod === "stripe"}
                     onChange={() => setPaymentMethod("stripe")}
                   />
-                  <label className="form-check-label">Credit/Debit Card (Stripe)</label>
+                  <label className="form-check-label">{t("checkout.stripe")}</label>
                 </div>
                 <div className="form-check">
                   <input
@@ -180,7 +182,7 @@ const Checkout = () => {
                     checked={paymentMethod === "paypal"}
                     onChange={() => setPaymentMethod("paypal")}
                   />
-                  <label className="form-check-label">PayPal</label>
+                  <label className="form-check-label">{t("checkout.paypal")}</label>
                 </div>
               </div>
 
@@ -198,7 +200,7 @@ const Checkout = () => {
 
               {paymentMethod === "cod" && (
                 <button type="submit" className="btn btn-success mt-3">
-                  Place Order (COD)
+                  {t("checkout.placeOrderCod")}
                 </button>
               )}
             </form>

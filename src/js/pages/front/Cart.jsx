@@ -3,13 +3,15 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { Link } from "react-router-dom";
 import { CartContext } from "../../context/CartContext";
+import { useTranslation } from "react-i18next";
 
 const Cart = () => {
   const { cart, fetchCart, updateCartItem, removeCartItem } = useContext(CartContext);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
-    document.title = "Cart | MyShop";
+    document.title = t("cart.metaTitle");
     
     const fetch = async () => {
       setLoading(true);
@@ -18,7 +20,7 @@ const Cart = () => {
     };
 
     fetch();
-  }, []);
+  }, [t, i18n.language]);
 
   const handleQtyChange = (itemId, qty) => {
     updateCartItem(itemId, qty);
@@ -32,7 +34,7 @@ const Cart = () => {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading cart...</span>
+          <span className="visually-hidden">{t("cart.loading")}</span>
         </div>
       </div>
     );
@@ -43,18 +45,18 @@ const Cart = () => {
       <Navbar />
 
       <div className="container my-4">
-        <h2>Your Cart</h2>
+        <h2>{t("cart.title")}</h2>
         {cart.items.length === 0 ? (
-          <p>Your cart is empty.</p>
+          <p>{t("cart.empty")}</p>
         ) : (
           <table className="table">
             <thead>
               <tr>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Price</th>
-                <th>Subtotal</th>
-                <th>Actions</th>
+                <th>{t("cart.product")}</th>
+                <th>{t("cart.qty")}</th>
+                <th>{t("cart.price")}</th>
+                <th>{t("cart.subtotal")}</th>
+                <th>{t("cart.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -80,7 +82,7 @@ const Cart = () => {
                       className="btn btn-danger btn-sm"
                       onClick={() => handleRemove(item.id)}
                     >
-                      Remove
+                      {t("cart.remove")}
                     </button>
                   </td>
                 </tr>
@@ -88,14 +90,14 @@ const Cart = () => {
             </tbody>
           </table>
         )}
-        <h4>Subtotal: ${cart.subtotal}</h4>
+        <h4>{t("cart.subtotalLabel")}: ${cart.subtotal}</h4>
         {cart.items.length > 0 && (
           <div className="d-flex justify-content-between gap-2 mt-4">
             <Link to="/products" className="btn btn-secondary btn-lg">
-              Continue Shopping
+              {t("cart.continue")}
             </Link>
             <Link to="/checkout" className="btn btn-primary btn-lg">
-              Checkout
+              {t("cart.checkout")}
             </Link>
           </div>
         )}

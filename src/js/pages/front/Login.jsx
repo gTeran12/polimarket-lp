@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { useTranslation } from "react-i18next";
 
 import { AuthContext } from "../../context/AuthContext";
 
@@ -11,13 +12,15 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const { t, i18n } = useTranslation();
 
     // ✅ Redirect if already logged in
     useEffect(() => {
+        document.title = t("login.metaTitle");
         if (user) {
             navigate("/"); // redirect to home if logged in
         }
-    }, [user, navigate]);
+    }, [user, navigate, t, i18n.language]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -26,10 +29,10 @@ const Login = () => {
         const result = await login(email, password); // call context login
 
         if (result.success) {
-            alert("Login successful!");
+            alert(t("login.success"));
             navigate("/"); // redirect to home after login
         } else {
-            setError(result.errors.message || "Invalid credentials");
+            setError(result.errors.message || t("login.invalid"));
         }
     };
 
@@ -37,13 +40,13 @@ const Login = () => {
         <>
             <Navbar />
             <div className="container mt-5" style={{ maxWidth: "450px" }}>
-                <h3 className="mb-4">Login</h3>
+                <h3 className="mb-4">{t("login.title")}</h3>
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <form onSubmit={handleLogin}>
                     <div className="mb-3">
-                        <label className="form-label">Email</label>
+                        <label className="form-label">{t("login.email")}</label>
                         <input
                             type="email"
                             className="form-control"
@@ -54,7 +57,7 @@ const Login = () => {
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">Password</label>
+                        <label className="form-label">{t("login.password")}</label>
                         <input
                             type="password"
                             className="form-control"
@@ -64,7 +67,7 @@ const Login = () => {
                         />
                     </div>
 
-                    <button className="btn btn-primary w-100">Login</button>
+                    <button className="btn btn-primary w-100">{t("login.submit")}</button>
                 </form>
             </div>
             <Footer />
