@@ -9,7 +9,6 @@ const baseURL =
 // Axios client configured to hit the API (defaults to Laravel dev server)
 const axiosClient = axios.create({
   baseURL,
-  withCredentials: true,
 });
 
 // Attach guest ID automatically

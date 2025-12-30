@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
         try {
             setLoading(true);
-            const response = await axios.get("/user");
+            const response = await axios.get("/api/user");
             setUser(response.data);
         } catch (err) {
             if (err.response?.status === 401) {
@@ -46,8 +46,7 @@ export const AuthProvider = ({ children }) => {
                 headers['X-Guest-ID'] = guestId;
             }
 
-            await axios.get('/sanctum/csrf-cookie');
-            const response = await axios.post("/login", { email, password }, { headers });
+            const response = await axios.post("/api/login", { email, password }, { headers });
             
             localStorage.setItem("token", response.data.token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
@@ -69,10 +68,7 @@ export const AuthProvider = ({ children }) => {
     // Register
     const register = async (name, email, password, password_confirmation) => {
         try {
-            const response = await axios.post("/register", { name, email, password, password_confirmation });
-            localStorage.setItem("token", response.data.token);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-            await fetchUser();
+            await axios.post("/api/users", { name, email, password, password_confirmation });
             return { success: true };
         } catch (err) {
             console.error(err.response?.data || err);
@@ -83,7 +79,7 @@ export const AuthProvider = ({ children }) => {
     // Logout
     const logout = async () => {
         try {
-            await axios.post("/logout"); // API call
+            await axios.post("/api/logout"); // API call
             localStorage.removeItem("token"); // remove token
             delete axios.defaults.headers.common['Authorization'];
             setUser(null); // <- THIS triggers Navbar re-render
@@ -94,7 +90,7 @@ export const AuthProvider = ({ children }) => {
 
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, setUser, loading, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -14,7 +14,7 @@ export default function Profile() {
     useEffect(() => {
         document.title = t("profile.metaTitle");
         if (!user) {
-            axios.get("/user")
+            axios.get("/api/user")
                 .then(res => setUser(res.data))
                 .finally(() => setLoading(false));
         } else {

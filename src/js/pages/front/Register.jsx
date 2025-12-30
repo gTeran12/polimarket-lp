@@ -37,9 +37,7 @@ const Register = () => {
         e.preventDefault();
 
         try {
-            await axios.get("/sanctum/csrf-cookie");
-
-            const res = await axios.post("/register", form);
+            await axios.post("/api/users", form);
 
             setMessage(t("register.success"));
             setErrors({}); // Clear errors
@@ -51,9 +49,6 @@ const Register = () => {
                 password: "",
                 password_confirmation: ""
             });
-
-            // Optional: store token
-            localStorage.setItem("token", res.data.token);
 
             // Redirect to login page after success
             setTimeout(() => navigate("/login"), 1000);

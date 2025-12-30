@@ -40,9 +40,6 @@ const Checkout = () => {
   const handlePlaceOrder = async (e, stripePaymentMethodId = null, paypalOrderId = null) => {
     e?.preventDefault();
     try {
-      // CSRF cookie for Laravel Sanctum
-      await axiosClient.get("/sanctum/csrf-cookie");
-
       // Prepare order payload
       const orderData = {
         address,
