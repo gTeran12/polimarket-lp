@@ -16,11 +16,15 @@ import {
 } from "react-bootstrap";
 import "../../../css/style.css";
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useContext(CartContext);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("latest");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const { t, i18n } = useTranslation();
@@ -35,6 +39,10 @@ const Products = () => {
   }, [t, i18n.language]);
 
   useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     let sortedProducts = [...products];
     if (sortOrder === "price-asc") {
       sortedProducts.sort((a, b) => a.price - b.price);
@@ -44,12 +52,21 @@ const Products = () => {
       sortedProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     }
 
-    const filtered = sortedProducts.filter((product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const normalizedSearch = searchTerm.toLowerCase();
+    const selectedCategoryId = selectedCategory ? Number(selectedCategory) : null;
+
+    const filtered = sortedProducts.filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(normalizedSearch);
+      const matchesCategory =
+        !selectedCategoryId ||
+        product.category_id === selectedCategoryId ||
+        product.category?.id === selectedCategoryId;
+
+      return matchesSearch && matchesCategory;
+    });
     setFilteredProducts(filtered);
     setDisplayedProductCount(PRODUCTS_PER_PAGE); // Reset count on search/sort change
-  }, [searchTerm, sortOrder, products]);
+  }, [searchTerm, sortOrder, products, selectedCategory]);
 
   const fetchProducts = async () => {
     try {
@@ -64,6 +81,16 @@ const Products = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const res = await axiosClient.get("/api/categories");
+      const list = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      setCategories(list);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleLoadMore = () => {
     setDisplayedProductCount((prevCount) => prevCount + PRODUCTS_PER_PAGE);
   };
@@ -73,6 +100,10 @@ const Products = () => {
     alert(t("products.addedAlert", { name: product.name }));
   };
 
+  const activeCategories = categories.filter(
+    (category) => category.status === 1 || category.status === true
+  );
+
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -80,8 +111,8 @@ const Products = () => {
       <Navbar />
       <Container className="mt-5 flex-grow-1">
         <h2 className="mb-4 text-center">{t("products.heading")}</h2>
-        <Row className="mb-4">
-          <Col md={6}>
+        <Row className="mb-4 g-3">
+          <Col md={4}>
             <FormControl
               type="text"
               placeholder={t("products.searchPlaceholder")}
@@ -90,7 +121,21 @@ const Products = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </Col>
-          <Col md={6} className="d-flex justify-content-end">
+          <Col md={4}>
+            <Form.Select
+              aria-label={t("products.categoryLabel")}
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">{t("products.allCategories")}</option>
+              {activeCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+          <Col md={4} className="d-flex justify-content-md-end">
             <Form.Select
               onChange={(e) => setSortOrder(e.target.value)}
               value={sortOrder}
@@ -108,7 +153,7 @@ const Products = () => {
               <Card className="h-100 shadow-sm product-card">
                 <Card.Img
                   variant="top"
-                  src={`/uploads/products/${product.image}`}
+                  src={`${apiBaseUrl}/uploads/products/${product.image}`}
                   alt={product.name}
                   className="product-img"
                 />

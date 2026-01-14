@@ -10,8 +10,12 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     // LISTAR USUARIOS
-    public function index()
+    public function index(Request $request)
     {
+        if (!$this->adminFromToken($request)) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
         return response()->json(User::all());
     }
 

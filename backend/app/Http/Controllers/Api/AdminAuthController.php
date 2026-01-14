@@ -58,18 +58,4 @@ class AdminAuthController extends Controller
         return response()->json(['message' => 'Logged out']);
     }
 
-    private function adminFromToken(Request $request): ?User
-    {
-        $token = $request->bearerToken();
-
-        if (!$token) {
-            return null;
-        }
-
-        $tokenHash = hash('sha256', $token);
-
-        return User::where('api_token', $tokenHash)
-            ->where('is_admin', true)
-            ->first();
-    }
 }

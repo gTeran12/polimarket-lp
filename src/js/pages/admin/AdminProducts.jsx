@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Table, Spinner } from "react-bootstrap";
 import axios from "axios";
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -180,7 +182,7 @@ const AdminProducts = () => {
                   <td>
                     {product.image ? (
                         <img
-                        src={`/uploads/products/${product.image}`}
+                        src={`${apiBaseUrl}/uploads/products/${product.image}`}
                         alt={product.name}
                         style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }}
                         />
