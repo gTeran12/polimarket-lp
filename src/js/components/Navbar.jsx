@@ -64,6 +64,9 @@ const Navbar = () => {
                                 )}
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/messages" onClick={handleNavLinkClick}>Mensajes</Link>
+                        </li>
 
                         {/* Show Login/Register if user not logged in */}
                         {!user && (
