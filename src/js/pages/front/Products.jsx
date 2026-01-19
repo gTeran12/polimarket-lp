@@ -71,8 +71,8 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const res = await axiosClient.get("/api/frontend/products");
-      setProducts(res.data.products);
-      setFilteredProducts(res.data.products);
+      setProducts(res.data.products || []);
+      setFilteredProducts(res.data.products || []);
       setDisplayedProductCount(PRODUCTS_PER_PAGE); // Initialize displayed count
     } catch (err) {
       console.error(err);

@@ -33,6 +33,7 @@ import OrderHistory from './pages/front/OrderHistory';
 import OrderDetail from './pages/front/OrderDetail';
 import Login from './pages/front/Login';
 import Register from './pages/front/Register';
+import Messages from './pages/front/Messages';
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin';
@@ -57,6 +58,7 @@ function App() {
                             <Route path="products" element={<Products />} />
                             <Route path="cart" element={<Cart />} />
                             <Route path="checkout" element={<Checkout />} />
+                            <Route path="messages" element={<Messages />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>
                                     <Profile />

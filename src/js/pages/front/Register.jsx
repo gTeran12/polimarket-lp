@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import axios from "axios";
+import axiosClient from "../../context/axiosClient";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +37,7 @@ const Register = () => {
         e.preventDefault();
 
         try {
-            await axios.post("/api/users", form);
+            await axiosClient.post("/api/users", form);
 
             setMessage(t("register.success"));
             setErrors({}); // Clear errors
