@@ -1,16 +1,34 @@
-# React + Vite
+# Polimarket LP
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Requisitos
+- Node.js 18+ y npm
+- PHP 8.2+
+- Composer
 
-Currently, two official plugins are available:
+## Backend (Laravel)
+1. `cd backend`
+2. Copia el archivo de entorno si no existe:
+   - Windows: `copy .env.example .env`
+   - macOS/Linux: `cp .env.example .env`
+3. (Opcional) Ajusta `ADMIN_NAME`, `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `backend/.env`.
+4. Crea la base SQLite:
+   - Windows: `type nul > database/database.sqlite`
+   - macOS/Linux: `touch database/database.sqlite`
+5. Instala dependencias:
+   - `composer install` (o `php composer.phar install` si no tienes Composer global)
+6. Genera la key:
+   - `php artisan key:generate`
+7. Ejecuta migraciones y seeders:
+   - `php artisan migrate --seed`
+8. Levanta el servidor:
+   - `php artisan serve` (por defecto `http://127.0.0.1:8000`)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Frontend (React + Vite)
+1. Desde la raiz del repo: `npm install`
+2. (Opcional) Crea un `.env` en la raiz con:
+   - `VITE_API_BASE_URL=http://127.0.0.1:8000`
+3. Levanta el front:
+   - `npm run dev` (por defecto `http://localhost:5173`)
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Notas
+- Si cambias el puerto del backend, actualiza `VITE_API_BASE_URL`.
