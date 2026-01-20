@@ -18,25 +18,28 @@ class AdminAuthController extends Controller
         ]);
 
         $user = User::where('email', $credentials['email'])
-            ->where('is_admin', true)
+            ->where('is_admin', true) // Verifica que sea admin
             ->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        // Generamos el token manual
         $plainToken = Str::random(60);
         $user->api_token = hash('sha256', $plainToken);
         $user->save();
 
+        // IMPORTANTE: Aquí retornamos 'token', que es lo que busca tu React
         return response()->json([
             'user' => $user,
-            'token' => $plainToken,
+            'token' => $plainToken, 
         ]);
     }
 
     public function user(Request $request)
     {
+        // Esta función fallaba antes porque adminFromToken no existía
         $user = $this->adminFromToken($request);
 
         if (!$user) {
@@ -58,4 +61,5 @@ class AdminAuthController extends Controller
         return response()->json(['message' => 'Logged out']);
     }
 
+    
 }

@@ -16,16 +16,47 @@ Route::get('/test', function () {
     ]);
 });
 
-// AUTH
+// ----------------------------------------------------
+// RUTAS PÚBLICAS
+// ----------------------------------------------------
+
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/users', [UserController::class, 'store']); 
+
+Route::get('/categories', [CategoryController::class, 'index']);
+
+// Carrito
+Route::get('/cart', [CartController::class, 'index']);
+Route::post('/cart', [CartController::class, 'store']);
+
+// Frontend Público
+Route::prefix('frontend')->group(function () {
+    Route::get('/products', [ProductController::class, 'frontendIndex']);
+    Route::get('/cart', [CartController::class, 'frontendIndex']);
+    Route::post('/cart', [CartController::class, 'frontendStore']);
+    Route::put('/cart/{cartItem}', [CartController::class, 'frontendUpdate']);
+    Route::delete('/cart/{cartItem}', [CartController::class, 'frontendDestroy']);
+});
+
+
+// ----------------------------------------------------
+// RUTAS PROTEGIDAS (Validación Manual en Controlador)
+// ----------------------------------------------------
+// OJO: Quité "middleware('auth:sanctum')" porque usas validación manual.
+// Tus controladores usarán $this->userFromToken() para protegerse.
+
+// USUARIO
 Route::get('/user', [AuthController::class, 'user']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
-// Messages
+// MENSAJES
 Route::get('/messages', [MessageController::class, 'index']);
 Route::post('/messages', [MessageController::class, 'store']);
 
-// ADMIN AUTH
+
+// ----------------------------------------------------
+// ADMIN / BACKEND
+// ----------------------------------------------------
 Route::prefix('backend')->group(function () {
     Route::post('/login', [AdminAuthController::class, 'login']);
     Route::get('/user', [AdminAuthController::class, 'user']);
@@ -43,22 +74,4 @@ Route::prefix('backend')->group(function () {
     Route::get('/categories-list', [CategoryController::class, 'listForAdmin']);
 
     Route::get('/users', [UserController::class, 'index']);
-});
-
-// CATEGORÍAS
-Route::get('/categories', [CategoryController::class, 'index']);
-Route::post('/categories', [CategoryController::class, 'store']);
-
-Route::get('/users', [UserController::class, 'index']);
-Route::post('/users', [UserController::class, 'store']);
-
-Route::get('/cart', [CartController::class, 'index']);
-Route::post('/cart', [CartController::class, 'store']);
-
-Route::prefix('frontend')->group(function () {
-    Route::get('/products', [ProductController::class, 'frontendIndex']);
-    Route::get('/cart', [CartController::class, 'frontendIndex']);
-    Route::post('/cart', [CartController::class, 'frontendStore']);
-    Route::put('/cart/{cartItem}', [CartController::class, 'frontendUpdate']);
-    Route::delete('/cart/{cartItem}', [CartController::class, 'frontendDestroy']);
 });

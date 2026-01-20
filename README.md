@@ -25,3 +25,6 @@ Debes correr el backend con:
 -composer install
 -php artisan migrate
 -php artisan serve
+
+Especificaciones:
+- Debes tener versiones iguales o superiores a php 8.4.0, tambien debes contar con un servidor para correr la base de datos en mi caso utilizo laragon con sus debidas especificaciones.
