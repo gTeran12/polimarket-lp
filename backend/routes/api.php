@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\OrderController;
 
 
 Route::get('/test', function () {
@@ -38,6 +39,15 @@ Route::prefix('frontend')->group(function () {
     Route::delete('/cart/{cartItem}', [CartController::class, 'frontendDestroy']);
 });
 
+Route::prefix('frontend')->group(function () {
+    
+    // Crear Orden (Checkout)
+    Route::post('/orders', [OrderController::class, 'store']);
+    
+    // Ver mis ordenes (Historial)
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+});
 
 // ----------------------------------------------------
 // RUTAS PROTEGIDAS (Validación Manual en Controlador)
@@ -48,6 +58,9 @@ Route::prefix('frontend')->group(function () {
 // USUARIO
 Route::get('/user', [AuthController::class, 'user']);
 Route::post('/logout', [AuthController::class, 'logout']);
+// PERFIL
+Route::put('/user', [UserController::class, 'update']);
+Route::put('/user/password', [UserController::class, 'updatePassword']);
 
 // MENSAJES
 Route::get('/messages', [MessageController::class, 'index']);
