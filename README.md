@@ -53,3 +53,6 @@ Debes correr el backend con:
 -php artisan migrate
 -php artisan serve
 >>>>>>> dc60df894baf503b3b105cedcd1a6cb976dd1823
+
+## Conclusiones
+- Nombre del integrante: Escribe tu conclusion sobre el lenguaje usado, herramientas, el proyecto y la experiencia de desarrollo.
