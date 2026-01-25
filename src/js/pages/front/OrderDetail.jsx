@@ -1,134 +1,101 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axiosClient from '../../context/axiosClient';
-import { AuthContext } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import axiosClient from '../../context/axiosClient'; // <--- Importante
 import { useTranslation } from 'react-i18next';
 
 const OrderDetail = () => {
-    const { orderId } = useParams();
+    const { orderId } = useParams(); // Obtiene el ID de la URL
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const { user } = useContext(AuthContext);
-    const { t, i18n } = useTranslation();
+    const [error, setError] = useState('');
+    const { t } = useTranslation();
 
     useEffect(() => {
-        document.title = t("orderDetail.metaTitle");
-        const fetchOrderDetail = async () => {
-            if (!user) {
-                setError(t("orderDetail.mustLogin"));
+        // Pedimos al backend el detalle de la orden ID
+        axiosClient.get(`/api/frontend/orders/${orderId}`)
+            .then(res => {
+                setOrder(res.data);
                 setLoading(false);
-                return;
-            }
-            try {
-                const response = await axiosClient.get(`/api/frontend/orders/${orderId}`);
-                setOrder(response.data);
-            } catch (err) {
-                if (err.response && err.response.status === 403) {
-                    setError(t("orderDetail.unauthorized"));
-                } else {
-                    setError(t("orderDetail.fetchError"));
-                }
+            })
+            .catch(err => {
                 console.error(err);
-            } finally {
+                setError('No se pudo cargar la orden. Puede que no exista o no tengas permisos.');
                 setLoading(false);
-            }
-        };
+            });
+    }, [orderId]);
 
-        fetchOrderDetail();
-    }, [orderId, user, t, i18n.language]);
-
-    if (loading) return (
-        <div className="d-flex flex-column min-vh-100">
-            <Navbar />
-            <main className="flex-grow-1 container mt-4">{t("orderDetail.loading")}</main>
-            <Footer />
-        </div>
-    );
-
-    if (error) return (
-        <div className="d-flex flex-column min-vh-100">
-            <Navbar />
-            <main className="flex-grow-1 container mt-4">{error}</main>
-            <Footer />
-        </div>
-    );
-
-    if (!order) return (
-        <div className="d-flex flex-column min-vh-100">
-            <Navbar />
-            <main className="flex-grow-1 container mt-4">{t("orderDetail.notFound")}</main>
-            <Footer />
-        </div>
-    );
-
-    const { shipping_address: address } = order;
+    if (loading) return <div className="container py-5">Cargando...</div>;
+    if (error) return <div className="container py-5 text-danger">{error}</div>;
+    if (!order) return null;
 
     return (
-        <div className="d-flex flex-column min-vh-100">
+        <div>
             <Navbar />
-            <main className="flex-grow-1 container mt-5">
-                <div className="card">
-                    <div className="card-header d-flex justify-content-between align-items-center">
-                        <h2>{t("orderDetail.title")}</h2>
-                        <Link to="/order-history" className="btn btn-secondary">{t("orderDetail.back")}</Link>
+            <div className="container py-5">
+                <Link to="/order-history" className="btn btn-outline-secondary mb-3">
+                    &larr; Volver al historial
+                </Link>
+
+                <div className="card shadow-sm">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 className="mb-0">Orden #{order.id}</h4>
+                        <span className="badge bg-light text-dark">{order.order_status}</span>
                     </div>
                     <div className="card-body">
+                        {/* Detalles Generales */}
                         <div className="row mb-4">
                             <div className="col-md-6">
-                                <h5>{t("orderDetail.order", { id: order.id })}</h5>
-                                <p><strong>{t("orderDetail.date")}</strong> {new Date(order.created_at).toLocaleDateString()}</p>
-                                <p><strong>{t("orderDetail.status")}</strong> <span className="text-capitalize">{order.status}</span></p>
-                                <p><strong>{t("orderDetail.paymentMethod")}</strong> <span className="text-uppercase">{order.payment_method}</span></p>
+                                <h5>Detalles de Envío</h5>
+                                <p className="mb-1"><strong>Nombre:</strong> {order.address.name}</p>
+                                <p className="mb-1"><strong>Dirección:</strong> {order.address.street}, {order.address.city}</p>
+                                <p className="mb-1"><strong>Teléfono:</strong> {order.address.phone}</p>
                             </div>
-                            <div className="col-md-6">
-                                <h5>{t("orderDetail.shippingAddress")}</h5>
-                                <address>
-                                    <strong>{address.name}</strong><br />
-                                    {address.street}<br />
-                                    {address.city}, {address.zip}<br />
-                                    <abbr title={t("orderDetail.phoneShort")}>{t("orderDetail.phoneShort")}</abbr> {address.phone}
-                                </address>
+                            <div className="col-md-6 text-md-end">
+                                <h5>Resumen de Pago</h5>
+                                <p className="mb-1"><strong>Método:</strong> {order.payment_method.toUpperCase()}</p>
+                                <p className="mb-1"><strong>Estado Pago:</strong> {order.payment_status}</p>
+                                <p className="mb-1"><strong>Fecha:</strong> {new Date(order.created_at).toLocaleDateString()}</p>
                             </div>
                         </div>
 
-                        <h5>{t("orderDetail.items")}</h5>
-                        <table className="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>{t("orderDetail.product")}</th>
-                                    <th>{t("orderDetail.quantity")}</th>
-                                    <th>{t("orderDetail.price")}</th>
-                                    <th>{t("orderDetail.subtotal")}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {order.items.map(item => (
-                                    <tr key={item.id}>
-                                        <td>{item.product ? item.product.name : t("orderDetail.missingProduct")}</td>
-                                        <td>{item.qty}</td>
-                                        <td>${parseFloat(item.price).toFixed(2)}</td>
-                                        <td>${(item.qty * item.price).toFixed(2)}</td>
+                        {/* Tabla de Productos */}
+                        <h5>Productos Comprados</h5>
+                        <div className="table-responsive">
+                            <table className="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Precio Unit.</th>
+                                        <th>Cantidad</th>
+                                        <th className="text-end">Total</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                        <div className="row text-end">
-                            <div className="col-md-9"><strong>{t("orderDetail.totals.subtotal")}</strong></div>
-                            <div className="col-md-3">${parseFloat(order.subtotal).toFixed(2)}</div>
-                            <div className="col-md-9"><strong>{t("orderDetail.totals.shipping")}</strong></div>
-                            <div className="col-md-3">${parseFloat(order.shipping).toFixed(2)}</div>
-                            <div className="col-md-9"><strong>{t("orderDetail.totals.discount")}</strong></div>
-                            <div className="col-md-3">-${parseFloat(order.discount).toFixed(2)}</div>
-                            <div className="col-md-9"><h5>{t("orderDetail.totals.total")}</h5></div>
-                            <div className="col-md-3"><h5>${parseFloat(order.total).toFixed(2)}</h5></div>
+                                </thead>
+                                <tbody>
+                                    {order.items.map((item) => (
+                                        <tr key={item.id}>
+                                            <td>
+                                                {/* Verificamos si existe el producto, si fue borrado mostramos un texto */}
+                                                {item.product ? item.product.name : 'Producto no disponible'}
+                                            </td>
+                                            <td>${Number(item.price).toFixed(2)}</td>
+                                            <td>{item.quantity}</td>
+                                            <td className="text-end">${(item.price * item.quantity).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colSpan="3" className="text-end fw-bold">Total Pagado:</td>
+                                        <td className="text-end fw-bold fs-5">${Number(order.total).toFixed(2)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
             <Footer />
         </div>
     );

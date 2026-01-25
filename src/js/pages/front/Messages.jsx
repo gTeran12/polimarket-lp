@@ -2,7 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import Navbar from '../../components/Navbar';
 import axiosClient from '../../context/axiosClient';
 import { AuthContext } from '../../context/AuthContext';
-import LoadingSpinner from '../../components/LoadingSpinner';
+// Si no tienes el componente LoadingSpinner, puedes usar un texto simple o div
+import LoadingSpinner from '../../components/LoadingSpinner'; 
 
 const Messages = () => {
     const [messages, setMessages] = useState([]);
@@ -11,16 +12,30 @@ const Messages = () => {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('inbox');
     const { user } = useContext(AuthContext);
+    
+    // Hook para navegar
+    const navigate = useNavigate();
+    // Referencia para bajar el scroll automáticamente
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
         fetchMessages();
     }, []);
 
+    // Efecto para bajar el scroll cuando llega un mensaje nuevo
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
     const fetchMessages = async () => {
         setLoadingMessages(true);
         setError(null);
         try {
-            const response = await axiosClient.get('/messages');
+            const response = await axiosClient.get('/api/messages');
             setMessages(response.data);
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -69,7 +84,7 @@ const Messages = () => {
     };
 
     if (loadingMessages) {
-        return <LoadingSpinner />;
+        return <div className="d-flex justify-content-center p-5"><LoadingSpinner /></div>;
     }
 
     return (

@@ -35,6 +35,7 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
+        // Usa la función del Padre (Controller.php)
         $user = $this->userFromToken($request);
 
         if (!$user) {
@@ -54,18 +55,5 @@ class AuthController extends Controller
         }
 
         return response()->json(['message' => 'Logged out']);
-    }
-
-    private function userFromToken(Request $request): ?User
-    {
-        $token = $request->bearerToken();
-
-        if (!$token) {
-            return null;
-        }
-
-        $tokenHash = hash('sha256', $token);
-
-        return User::where('api_token', $tokenHash)->first();
     }
 }
