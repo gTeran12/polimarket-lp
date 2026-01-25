@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import axiosClient from '../../context/axiosClient';
 import { AuthContext } from '../../context/AuthContext';
-// Si no tienes el componente LoadingSpinner, puedes usar un texto simple o div
-import LoadingSpinner from '../../components/LoadingSpinner'; 
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const Messages = () => {
     const [messages, setMessages] = useState([]);
